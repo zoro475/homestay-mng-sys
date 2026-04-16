@@ -10,18 +10,22 @@ jobs:
   sonarcloud:
     name: SonarCloud Scan
     runs-on: ubuntu-latest
-    
 
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Tắt warning Node.js 20
 
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0   
+          fetch-depth: 0
 
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v7  
+        uses: SonarSource/sonarqube-scan-action@v7
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # === PHẦN BẠN CẦN THAY ĐỔI ===
+          projectKey: zoro475_homestay-mng-sys          # ← Thay bằng Project Key thật
+          organization: zoro475      # ← Thay bằng Organization Key
+          # =============================
