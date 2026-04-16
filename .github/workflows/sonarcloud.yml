@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Tắt warning Node.js 20
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - uses: actions/checkout@v4
@@ -23,9 +23,8 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v7
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Nếu cần có thể thêm SONAR_HOST_URL nhưng với SonarCloud thường không cần
         with:
-          # === PHẦN BẠN CẦN THAY ĐỔI ===
-          projectKey: zoro475_homestay-mng-sys          # ← Thay bằng Project Key thật
-          organization: zoro475      # ← Thay bằng Organization Key
-          # =============================
+          args: >
+            -Dsonar.organization=zoro475
+            -Dsonar.projectKey=zoro475_homestay-mng-sys
