@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký | Homestay Booking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+    <style>
+        body { margin: 0; font-family: 'Outfit', sans-serif; background: var(--bg-light); }
+        .split-layout { display: flex; width: 100%; min-height: 100vh; }
+        .image-section {
+            flex: 1;
+            background: url('https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat;
+            display: none;
+            position: relative;
+        }
+        .image-overlay {
+            position: absolute; top:0; left:0; right:0; bottom:0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.8));
+            display: flex; flex-direction: column; justify-content: flex-end; padding: 3rem; color: white;
+        }
+        .image-overlay h2 { font-size: 2.5rem; margin-bottom: 1rem; }
+        .image-overlay p { font-size: 1.1rem; opacity: 0.9; line-height: 1.5; }
+        @media (min-width: 900px) { .image-section { display: flex; } }
+        
+        .form-section {
+            flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem;
+            background: white; overflow-y: auto;
+        }
+        .login-card {
+            width: 100%; max-width: 450px; animation: fadeInUp 0.5s ease;
+        }
+        .login-card h2 { margin-bottom: 1.5rem; color: var(--primary); font-size: 2rem; text-align: center; }
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 0.4rem; color: #333; }
+        .form-control {
+            width: 100%; padding: 12px 15px; border: 1px solid var(--border); border-radius: 12px;
+            font-size: 1rem; outline: none; background: #f9f9f9; transition: border 0.3s;
+        }
+        .form-control:focus { border-color: var(--primary); background: white; }
+        .btn-submit {
+            width: 100%; background: var(--primary); color: white; border: none; padding: 14px;
+            border-radius: 12px; font-size: 1.1rem; font-weight: 600; cursor: pointer; margin-top: 1rem; transition: background 0.3s;
+        }
+        .btn-submit:hover { background: var(--primary-dark); }
+        .alert { padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-weight: 500; }
+        .alert-error { background-color: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+        .back-home { position: absolute; top: 2rem; right: 2rem; color: var(--text-muted); font-weight: 600; font-size: 1.1rem; z-index: 10; }
+        .back-home:hover { color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <div class="split-layout">
+        <!-- Cột hình ảnh -->
+        <div class="image-section">
+            <div class="image-overlay">
+                <h2>Bắt đầu hành trình của bạn</h2>
+                <p>Tạo tài khoản miễn phí để nhận ngay mã ưu đãi dành cho thành viên mới và quản lý các chuyến đi dễ dàng.</p>
+            </div>
+        </div>
+
+        <!-- Cột form -->
+        <div class="form-section" style="position: relative;">
+            <a href="/" class="back-home"><i class="fa-solid fa-xmark"></i></a>
+            
+            <div class="login-card">
+                <h2>Tạo tài khoản mới</h2>
+                
+                <div th:if="${error}" class="alert alert-error">
+                    <p th:text="${error}"></p>
+                </div>
+
+                <form th:action="@{/register}" th:object="${user}" method="post">
+                    <div class="form-group">
+                        <label>Họ và tên</label>
+                        <input type="text" th:field="*{fullName}" class="form-control" placeholder="Trần Văn A" required autofocus>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Tên đăng nhập</label>
+                        <input type="text" th:field="*{username}" class="form-control" placeholder="Tên đăng nhập viết liền" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Mật khẩu</label>
+                        <input type="password" th:field="*{password}" class="form-control" placeholder="Ít nhất 6 ký tự" required>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label>Số điện thoại</label>
+                            <input type="text" th:field="*{phone}" class="form-control" placeholder="09xxxxxxx">
+                        </div>
+                        
+                        <div class="form-group" style="flex: 1;">
+                            <label>Email</label>
+                            <input type="email" th:field="*{email}" class="form-control" placeholder="abc@email.com">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-submit">Đăng ký ngay</button>
+                </form>
+                
+                <p style="margin-top: 2rem; color: var(--text-muted); text-align: center;">
+                    Đã có tài khoản? <a href="/login" style="color: var(--primary); font-weight: 700;">Đăng nhập ngay</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

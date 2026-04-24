@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán đơn hàng | HomestayBooking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .payment-container {
+            max-width: 900px;
+            margin: 4rem auto;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 2rem;
+            animation: slideUpFade 0.8s ease-out;
+        }
+        .qr-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            border: 1px solid var(--border-light);
+        }
+        .info-card {
+            background: var(--bg-light);
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+        }
+        .vietqr-img {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            box-shadow: var(--shadow-md);
+        }
+        .timer {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 1rem 0;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px dashed var(--border);
+        }
+        .info-row:last-child { border: none; }
+        .label { color: var(--text-muted); font-size: 0.9rem; }
+        .value { font-weight: 600; color: var(--text-main); }
+    </style>
+</head>
+<body style="background: #f8fafc;">
+
+    <nav class="navbar">
+        <a href="/" class="nav-brand"><i class="fa-solid fa-house-chimney"></i> HomestayBooking</a>
+    </nav>
+
+    <div class="container">
+        <div class="payment-container">
+            <!-- Cột trái: QR Code -->
+            <div class="qr-card">
+                <h2 style="font-family: 'Playfair Display', serif; color: var(--primary);">Quét mã để thanh toán</h2>
+                <p style="color: var(--text-muted);">Sử dụng ứng dụng ngân hàng bất kỳ để quét mã VietQR</p>
+                
+                <div class="timer" id="countdown">10:00</div>
+                
+                <!-- Tạo URL VietQR động -->
+                <!-- Cấu trúc: https://img.vietqr.io/image/<BANK_ID>-<ACCOUNT_NO>-compact2.jpg?amount=<AMOUNT>&addInfo=<CONTENT>&accountName=<NAME> -->
+                <img th:src="'https://img.vietqr.io/image/VCB-012345678910-compact2.jpg?amount=' + ${booking.totalPrice} + '&addInfo=THANH TOAN DON ' + ${booking.id} + '&accountName=ADMIN HOMESTAY BOOKING'" 
+                     class="vietqr-img" alt="VietQR Payment">
+                
+                <div style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+                    <i class="fa-solid fa-circle-info"></i> Hệ thống sẽ tự động xác nhận sau khi nhận được tiền.
+                </div>
+            </div>
+
+            <!-- Cột phải: Thông tin đơn hàng -->
+            <div class="info-card">
+                <h3 style="margin-bottom: 1.5rem; font-weight: 700;">Thông tin đơn hàng</h3>
+                
+                <div class="info-row">
+                    <span class="label">Mã đơn hàng</span>
+                    <span class="value" th:text="'#' + ${booking.id}">#123</span>
+                </div>
+                
+                <div class="info-row">
+                    <span class="label">Homestay</span>
+                    <span class="value" th:text="${booking.homestay.name}">Tên Homestay</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Nhận phòng</span>
+                    <span class="value" th:text="${booking.checkInDate}">2024-12-24</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Trả phòng</span>
+                    <span class="value" th:text="${booking.checkOutDate}">2024-12-26</span>
+                </div>
+
+                <div class="info-row" style="margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--border);">
+                    <span class="label" style="font-size: 1.1rem; color: var(--text-main); font-weight: 700;">Tổng cộng</span>
+                    <span class="value" style="font-size: 1.2rem; color: var(--primary); font-weight: 800;" 
+                          th:text="${booking.totalPrice != null ? #numbers.formatDecimal(booking.totalPrice, 0, 'COMMA', 0, 'POINT') : '0'} + ' ₫'">1,500,000 ₫</span>
+                </div>
+
+                <div style="margin-top: 3rem;">
+                    <form th:action="@{'/booking/pay/' + ${booking.id}}" method="post">
+                        <button type="submit" class="btn-login" style="width: 100%; background: var(--primary); color: white; border: none; padding: 1.2rem; justify-content: center; font-size: 1.1rem;">
+                            Tôi đã chuyển khoản thành công
+                        </button>
+                    </form>
+                    <a href="/my-bookings" style="display: block; text-align: center; margin-top: 1.5rem; color: var(--text-muted); font-size: 0.9rem;">Thanh toán sau</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Countdown timer đơn giản
+        let time = 600; // 10 phút
+        const timerElement = document.getElementById('countdown');
+
+        setInterval(() => {
+            if (time <= 0) return;
+            time--;
+            let minutes = Math.floor(time / 60);
+            let seconds = time % 60;
+            timerElement.innerHTML = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }, 1000);
+    </script>
+</body>
+</html>

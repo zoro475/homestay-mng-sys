@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý Mã giảm giá | Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .admin-layout { display: flex; min-height: 100vh; }
+        .sidebar { width: 250px; background: white; border-right: 1px solid var(--border); padding: 2rem 1rem; }
+        .sidebar-menu { list-style: none; margin-top: 2rem; }
+        .sidebar-menu li a { display: block; padding: 10px 15px; border-radius: 8px; margin-bottom: 5px; color: var(--text-main); font-weight: 500; }
+        .sidebar-menu li a:hover, .sidebar-menu li a.active { background: var(--bg-light); color: var(--primary); }
+        .sidebar-menu i { width: 25px; }
+        .main-content { flex: 1; padding: 2rem; background: var(--bg-light); }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <a href="/" class="nav-brand" style="font-size:1.2rem"><i class="fa-solid fa-house-chimney"></i> AdminPanel</a>
+            <ul class="sidebar-menu">
+                <li><a href="/admin/dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</a></li>
+                <li><a href="/admin/homestays"><i class="fa-solid fa-bed"></i> Quản lý phòng</a></li>
+                <li><a href="/admin/bookings"><i class="fa-solid fa-calendar-check"></i> Đặt phòng</a></li>
+                <li><a href="/admin/users"><i class="fa-solid fa-users"></i> Khách hàng</a></li>
+                <li><a href="/admin/coupons" class="active"><i class="fa-solid fa-ticket"></i> Mã giảm giá</a></li>
+                <li><a href="/admin/reports"><i class="fa-solid fa-chart-line"></i> Báo cáo</a></li>
+                <li><a href="/logout" style="color:var(--primary); margin-top:20px"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2>Danh sách Mã giảm giá</h2>
+                <button class="btn-search" style="padding: 10px 20px; font-size: 0.9rem;">+ Tạo mã mới</button>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Mã</th>
+                        <th>Giảm (%)</th>
+                        <th>Ngày hết hạn</th>
+                        <th>Đã dùng</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="c : ${coupons}">
+                        <td th:text="${c.id}">1</td>
+                        <td th:text="${c.code}" style="font-weight: 700; color: var(--primary);">CODE</td>
+                        <td th:text="${c.discountPercent} + '%'">10%</td>
+                        <td th:text="${c.expiryDate}">-</td>
+                        <td th:text="${c.usedCount}">0</td>
+                        <td>
+                            <a href="#" style="color: blue; margin-right: 15px;"><i class="fa-solid fa-pen-to-square"></i></a>
+                            <a href="#" style="color: red;"><i class="fa-solid fa-trash"></i></a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
+    </div>
+</body>
+</html>

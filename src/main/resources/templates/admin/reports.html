@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Báo cáo & Thống kê | Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .admin-layout { display: flex; min-height: 100vh; }
+        .sidebar { width: 250px; background: white; border-right: 1px solid var(--border); padding: 2rem 1rem; }
+        .sidebar-menu { list-style: none; margin-top: 2rem; }
+        .sidebar-menu li a { display: block; padding: 10px 15px; border-radius: 8px; margin-bottom: 5px; color: var(--text-main); font-weight: 500; }
+        .sidebar-menu li a:hover, .sidebar-menu li a.active { background: var(--bg-light); color: var(--primary); }
+        .sidebar-menu i { width: 25px; }
+        .main-content { flex: 1; padding: 2rem; background: var(--bg-light); }
+        
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .report-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            text-align: center;
+        }
+        .report-card h3 { color: var(--text-muted); margin-bottom: 1rem; }
+        .report-card .value { font-size: 2.5rem; font-weight: 700; color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <a href="/" class="nav-brand" style="font-size:1.2rem"><i class="fa-solid fa-house-chimney"></i> AdminPanel</a>
+            <ul class="sidebar-menu">
+                <li><a href="/admin/dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</a></li>
+                <li><a href="/admin/homestays"><i class="fa-solid fa-bed"></i> Quản lý phòng</a></li>
+                <li><a href="/admin/bookings"><i class="fa-solid fa-calendar-check"></i> Đặt phòng</a></li>
+                <li><a href="/admin/users"><i class="fa-solid fa-users"></i> Khách hàng</a></li>
+                <li><a href="/admin/coupons"><i class="fa-solid fa-ticket"></i> Mã giảm giá</a></li>
+                <li><a href="/admin/reports" class="active"><i class="fa-solid fa-chart-line"></i> Báo cáo</a></li>
+                <li><a href="/logout" style="color:var(--primary); margin-top:20px"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <h2 style="margin-bottom: 1.5rem;">Báo cáo doanh thu & Thống kê</h2>
+            
+            <div class="report-grid">
+                <div class="report-card">
+                    <h3>Tổng doanh thu</h3>
+                    <div class="value" th:text="${#numbers.formatDecimal(totalRevenue, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">0 VNĐ</div>
+                    <p style="margin-top: 10px; font-size: 0.9rem;">(Dựa trên các đơn đã thanh toán/hoàn thành)</p>
+                </div>
+                
+                <div class="report-card">
+                    <h3>Tỷ lệ lấp đầy</h3>
+                    <div class="value" th:text="${totalBookings}">0</div>
+                    <p style="margin-top: 10px;">Tổng số lượt đặt phòng</p>
+                </div>
+            </div>
+
+            <div style="background: white; padding: 2rem; border-radius: 20px; margin-top: 2rem; box-shadow: var(--shadow-md);">
+                <h3>Thống kê trạng thái đặt phòng</h3>
+                <div style="display: flex; justify-content: space-around; margin-top: 2rem;">
+                    <div style="text-align: center;">
+                        <h4 style="color: orange;">Chờ duyệt</h4>
+                        <p style="font-size: 2rem; font-weight: 700;" th:text="${pendingBookings}">0</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <h4 style="color: green;">Hoàn thành</h4>
+                        <p style="font-size: 2rem; font-weight: 700;" th:text="${completedBookings}">0</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <h4 style="color: red;">Đã hủy</h4>
+                        <p style="font-size: 2rem; font-weight: 700;" th:text="${canceledBookings}">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 2rem; text-align: center; color: var(--text-muted);">
+                <p><i class="fa-solid fa-circle-info"></i> Báo cáo được cập nhật theo thời gian thực từ hệ thống.</p>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Khách hàng | Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .admin-layout { display: flex; min-height: 100vh; }
+        .sidebar { width: 250px; background: white; border-right: 1px solid var(--border); padding: 2rem 1rem; }
+        .sidebar-menu { list-style: none; margin-top: 2rem; }
+        .sidebar-menu li a { display: block; padding: 10px 15px; border-radius: 8px; margin-bottom: 5px; color: var(--text-main); font-weight: 500; }
+        .sidebar-menu li a:hover, .sidebar-menu li a.active { background: var(--bg-light); color: var(--primary); }
+        .sidebar-menu i { width: 25px; }
+        .main-content { flex: 1; padding: 2rem; background: var(--bg-light); }
+        .placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <a href="/" class="nav-brand" style="font-size:1.2rem"><i class="fa-solid fa-house-chimney"></i> AdminPanel</a>
+            <ul class="sidebar-menu">
+                <li><a href="/admin/dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</a></li>
+                <li><a href="/admin/homestays"><i class="fa-solid fa-bed"></i> Quản lý phòng</a></li>
+                <li><a href="/admin/bookings"><i class="fa-solid fa-calendar-check"></i> Đặt phòng</a></li>
+                <li><a href="/admin/users" class="active"><i class="fa-solid fa-users"></i> Khách hàng</a></li>
+                <li><a href="/admin/coupons"><i class="fa-solid fa-ticket"></i> Mã giảm giá</a></li>
+                <li><a href="/admin/reports"><i class="fa-solid fa-chart-line"></i> Báo cáo</a></li>
+                <li><a href="/logout" style="color:var(--primary); margin-top:20px"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <h2 style="margin-bottom: 1.5rem;">Danh sách Khách hàng</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Họ tên</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="u : ${users}">
+                        <td th:text="${u.id}">1</td>
+                        <td th:text="${u.fullName}">Name</td>
+                        <td th:text="${u.username}">Username</td>
+                        <td th:text="${u.email}">Email</td>
+                        <td th:text="${u.phone}">Phone</td>
+                        <td>
+                            <span th:if="${u.isBlacklisted != null and u.isBlacklisted}" class="status-badge" style="background:#ffebee; color:#c62828">BLACKLISTED</span>
+                            <span th:if="${u.isBlacklisted == null or !u.isBlacklisted}" class="status-badge" style="background:#e8f5e9; color:#2e7d32">ACTIVE</span>
+                        </td>
+                        <td>
+                            <form th:action="@{'/admin/users/blacklist/' + ${u.id}}" method="post" style="display:inline">
+                                <button type="submit" class="btn-search" style="padding:5px 10px; font-size:0.8rem; background: var(--primary)" 
+                                        th:text="${(u.isBlacklisted != null and u.isBlacklisted) ? 'Bỏ Blacklist' : 'Cho vào Blacklist'}">Action</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
+    </div>
+</body>
+</html>

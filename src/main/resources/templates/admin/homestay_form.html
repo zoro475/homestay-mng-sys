@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chỉnh sửa Homestay | Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .form-container { max-width: 800px; margin: 2rem auto; background: white; padding: 2.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-main); }
+        .form-control { width: 100%; padding: 0.8rem; border: 1px solid var(--border); border-radius: var(--radius-sm); outline: none; transition: var(--transition); }
+        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.1); }
+        .btn-submit { background: var(--primary); color: white; border: none; padding: 1rem 2rem; border-radius: var(--radius-sm); cursor: pointer; font-weight: 700; width: 100%; transition: var(--transition); }
+        .btn-submit:hover { background: var(--primary-dark); transform: translateY(-2px); }
+    </style>
+</head>
+<body style="background: var(--bg-light);">
+    <div class="container">
+        <div class="form-container">
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 2rem;">
+                <a href="/admin/homestays" style="color: var(--text-muted);"><i class="fa-solid fa-arrow-left"></i> Quay lại</a>
+                <h2 style="font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--primary);">Thông tin Homestay</h2>
+            </div>
+
+            <form th:action="@{/admin/homestays/save}" th:object="${homestay}" method="post">
+                <input type="hidden" th:field="*{id}">
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label>Tên Homestay</label>
+                        <input type="text" th:field="*{name}" class="form-control" required placeholder="Nhập tên homestay...">
+                    </div>
+                    <div class="form-group">
+                        <label>Loại phòng</label>
+                        <select th:field="*{category.id}" class="form-control" required>
+                            <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label>Thành phố</label>
+                        <select th:field="*{city}" class="form-control" required>
+                            <option value="Đà Lạt">Đà Lạt</option>
+                            <option value="Hà Nội">Hà Nội</option>
+                            <option value="TP HCM">TP HCM</option>
+                            <option value="Sapa">Sapa</option>
+                            <option value="Vũng Tàu">Vũng Tàu</option>
+                            <option value="Phú Quốc">Phú Quốc</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Giá một đêm (VNĐ)</label>
+                        <input type="number" th:field="*{pricePerNight}" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Địa chỉ chi tiết</label>
+                    <input type="text" th:field="*{address}" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label>URL Hình ảnh</label>
+                    <input type="text" th:field="*{imageUrl}" class="form-control" placeholder="https://...">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Sức chứa (người)</label>
+                        <input type="number" th:field="*{capacity}" class="form-control" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Số giường</label>
+                        <input type="number" th:field="*{bedCount}" class="form-control" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Số phòng tắm</label>
+                        <input type="number" th:field="*{bathCount}" class="form-control" required min="1">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Mô tả chi tiết</label>
+                    <textarea th:field="*{description}" class="form-control" rows="5" style="resize: vertical;"></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit">Lưu thông tin</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

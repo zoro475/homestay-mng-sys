@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đánh giá phòng | Homestay Booking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        body { background: #f5f7fa; }
+        .container { max-width: 600px; margin: 3rem auto; }
+        .card { background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; padding: 30px; }
+        .card-title { font-size: 1.5rem; color: #333; margin-bottom: 20px; text-align: center; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #555; }
+        
+        /* Star rating */
+        .rating { display: flex; flex-direction: row-reverse; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .rating input { display: none; }
+        .rating label { cursor: pointer; width: 40px; height: 40px; font-size: 35px; color: #ccc; transition: 0.2s; text-align: center; line-height: 40px; }
+        .rating label:before { content: '★'; font-family: sans-serif; }
+        .rating input:checked ~ label, .rating label:hover, .rating label:hover ~ label { color: #ffca28; }
+        
+        textarea.form-control { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; resize: vertical; min-height: 120px; outline: none; transition: border 0.3s; box-sizing: border-box; font-family: inherit; }
+        textarea.form-control:focus { border-color: var(--primary); }
+        
+        .btn-submit { background: #4caf50; color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-submit:hover { background: #43a047; }
+        .btn-cancel { display: block; text-align: center; margin-top: 15px; color: #757575; text-decoration: none; font-weight: 500; }
+        .btn-cancel:hover { text-decoration: underline; color: #333; }
+        
+        .homestay-badge { text-align: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+        .homestay-badge p { color: var(--text-muted); margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="nav-brand"><i class="fa-solid fa-house-chimney"></i> StayZone</a>
+        <div class="nav-links">
+            <a href="/my-bookings">Quay lại Chuyến đi</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <div class="homestay-badge">
+                <i class="fa-solid fa-bed" style="font-size: 2rem; color: var(--primary); margin-bottom: 10px;"></i>
+                <h2 style="margin:0; font-size: 1.25rem;" th:text="${booking.homestay.name}">Tên Homestay</h2>
+                <p>Chuyến đi từ <span th:text="${booking.checkInDate}"></span> đến <span th:text="${booking.checkOutDate}"></span></p>
+            </div>
+
+            <h1 class="card-title">Bạn cảm thấy chuyến đi thế nào?</h1>
+            
+            <form th:action="@{/booking/review/{id}(id=${booking.id})}" method="POST">
+                <div class="form-group" style="text-align: center;">
+                    <label>Bình chọn số sao</label>
+                    <div class="rating">
+                        <input type="radio" id="star5" name="rating" value="5" required />
+                        <label for="star5" title="Tuyệt vời"></label>
+                        <input type="radio" id="star4" name="rating" value="4" />
+                        <label for="star4" title="Rất tốt"></label>
+                        <input type="radio" id="star3" name="rating" value="3" />
+                        <label for="star3" title="Bình thường"></label>
+                        <input type="radio" id="star2" name="rating" value="2" />
+                        <label for="star2" title="Tệ"></label>
+                        <input type="radio" id="star1" name="rating" value="1" />
+                        <label for="star1" title="Rất tệ"></label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="comment">Chia sẻ cảm nhận của bạn (Miêu tả)</label>
+                    <textarea id="comment" name="comment" class="form-control" placeholder="Chỗ nghỉ có sạch sẽ không? Chủ nhà có nhiệt tình không?..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit">Gửi đánh giá</button>
+            </form>
+            
+            <a href="/my-bookings" class="btn-cancel">Hủy và quay lại</a>
+        </div>
+    </div>
+
+</body>
+</html>

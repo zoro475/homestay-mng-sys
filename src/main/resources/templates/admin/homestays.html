@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Homestay | Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .admin-layout { display: flex; min-height: 100vh; }
+        .sidebar { width: 250px; background: white; border-right: 1px solid var(--border); padding: 2rem 1rem; }
+        .sidebar-menu { list-style: none; margin-top: 2rem; }
+        .sidebar-menu li a { display: block; padding: 10px 15px; border-radius: 8px; margin-bottom: 5px; color: var(--text-main); font-weight: 500; }
+        .sidebar-menu li a:hover, .sidebar-menu li a.active { background: var(--bg-light); color: var(--primary); }
+        .sidebar-menu i { width: 25px; }
+        .main-content { flex: 1; padding: 2rem; background: var(--bg-light); }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-sm); }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background-color: #f8f9fa; font-weight: 600; }
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+        .status-available { background-color: #e8f5e9; color: #2e7d32; }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <a href="/" class="nav-brand" style="margin-bottom: 2rem; display: block; font-size: 1.4rem;">
+                <i class="fa-solid fa-hotel"></i> Admin Suite
+            </a>
+            <ul class="sidebar-menu" style="list-style: none;">
+                <li><a href="/admin/dashboard"><i class="fa-solid fa-grip-vertical"></i> Tổng quan</a></li>
+                <li><a href="/admin/homestays" class="active"><i class="fa-solid fa-house-chimney-window"></i> Homestays</a></li>
+                <li><a href="/admin/bookings"><i class="fa-solid fa-receipt"></i> Đơn đặt phòng</a></li>
+                <li><a href="/admin/users"><i class="fa-solid fa-user-group"></i> Khách hàng</a></li>
+                <li><a href="/admin/coupons"><i class="fa-solid fa-tags"></i> Khuyến mãi</a></li>
+                <li><a href="/admin/reports"><i class="fa-solid fa-chart-bar"></i> Báo cáo</a></li>
+                <li style="margin-top: 4rem;"><a href="/logout" style="color: #e53e3e;"><i class="fa-solid fa-power-off"></i> Đăng xuất</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <div>
+                    <h2 style="font-size: 1.8rem; font-weight: 800;">Quản lý Homestay</h2>
+                    <p style="color: var(--text-muted);">Bạn có tổng cộng <span th:text="${homestays.size()}">0</span> homestay trên hệ thống.</p>
+                </div>
+                <a th:href="@{/admin/homestays/new}" class="btn-login" style="background: var(--primary); color: white; border: none; padding: 0.8rem 1.5rem; text-decoration: none;">+ Thêm homestay mới</a>
+            </div>
+
+            <div style="background: white; border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-md); border: 1px solid var(--border-light);">
+                <table class="data-table" style="box-shadow: none;">
+                    <thead>
+                        <tr>
+                            <th>Phòng</th>
+                            <th>Địa điểm</th>
+                            <th>Giá ghi nhận</th>
+                            <th>Sức chứa</th>
+                            <th>Trạng thái</th>
+                            <th>Dọn dẹp</th>
+                            <th style="text-align: right;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="hs : ${homestays}">
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <img th:src="${hs.imageUrl}" style="width: 48px; height: 48px; border-radius: 8px; object-fit: cover;">
+                                    <div>
+                                        <div style="font-weight: 600; color: #222;" th:text="${hs.name}">Tên</div>
+                                        <div style="font-size: 0.8rem; color: var(--text-muted);" th:text="${hs.category.name}">Category</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td th:text="${hs.city}">Location</td>
+                            <td>
+                                <span style="font-weight: 700; color: var(--accent);" th:text="${#numbers.formatDecimal(hs.pricePerNight, 0, 'COMMA', 0, 'POINT')} + ' đ'">Price</span>
+                            </td>
+                            <td th:text="${hs.capacity} + ' khách'">2 khách</td>
+                            <td>
+                                <span th:class="'status-badge badge-' + ${hs.status.toLowerCase()}" th:text="${hs.status}">AVAILABLE</span>
+                            </td>
+                            <td>
+                                <form th:action="@{'/admin/homestays/housekeeping/' + ${hs.id}}" method="post" style="display:inline">
+                                    <select name="status" onchange="this.form.submit()" 
+                                            style="padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.85rem; cursor: pointer; outline: none; background: #f9fafb;">
+                                        <option value="CLEAN" th:selected="${hs.housekeepingStatus == 'CLEAN'}">✨ Sạch</option>
+                                        <option value="DIRTY" th:selected="${hs.housekeepingStatus == 'DIRTY'}">🧹 Bẩn</option>
+                                        <option value="CLEANING" th:selected="${hs.housekeepingStatus == 'CLEANING'}">🧺 Đang dọn</option>
+                                    </select>
+                                </form>
+                            </td>
+                            <td style="text-align: right;">
+                                <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                                    <a th:href="@{'/admin/homestays/edit/' + ${hs.id}}" class="btn-login" style="padding: 6px 10px; font-size: 0.85rem; color: #2563eb; background: #eff6ff; border-color: #dbeafe;"><i class="fa-solid fa-pen"></i></a>
+                                    <a th:href="@{'/admin/homestays/delete/' + ${hs.id}}" class="btn-login" style="padding: 6px 10px; font-size: 0.85rem; color: #dc2626; background: #fef2f2; border-color: #fee2e2;" onclick="return confirm('Bạn có chắc chắn muốn xóa homestay này?')"><i class="fa-solid fa-trash-can"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div th:if="${totalPages > 1}" class="pagination" style="margin-top: 2rem;">
+                <a th:href="@{/admin/homestays(page=${currentPage - 1})}" th:class="'page-link ' + ${currentPage == 0 ? 'disabled' : ''}">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+                
+                <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+                   th:href="@{/admin/homestays(page=${i})}" 
+                   th:class="'page-link ' + ${currentPage == i ? 'active' : ''}" 
+                   th:text="${i + 1}">1</a>
+                
+                <a th:href="@{/admin/homestays(page=${currentPage + 1})}" th:class="'page-link ' + ${currentPage == totalPages - 1 ? 'disabled' : ''}">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

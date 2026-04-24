@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${homestay.name} + ' | Homestay Booking'">Chi tiết Homestay</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="nav-brand"><i class="fa-solid fa-house-chimney"></i> HomestayBooking</a>
+        <div class="nav-links">
+            <a href="/">Trang chủ</a>
+            <a href="/my-bookings">Chuyến đi</a>
+            <div th:if="${#authentication.name == 'anonymousUser'}">
+                <a href="/login" class="btn-login"><i class="fa-regular fa-user"></i> Đăng nhập</a>
+            </div>
+            <div th:if="${#authentication.name != 'anonymousUser'}" style="display: flex; gap: 1rem; align-items: center;">
+                <span style="font-weight: 600; color: var(--primary);">Chào, <span th:text="${#authentication.name}">User</span></span>
+                <a href="/logout" class="btn-login"><i class="fa-solid fa-arrow-right-from-bracket"></i> Thoát</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="detail-header">
+            <h1 th:text="${homestay.name}">Tên Homestay</h1>
+            <p style="color:var(--text-muted); font-size:1.1rem">
+                <i class="fa-solid fa-star" style="color: gold;"></i> 4.9 · <span th:text="${homestay.city} + ', ' + ${homestay.address}">Địa chỉ</span>
+            </p>
+        </div>
+
+        <img th:src="${homestay.imageUrl}" class="detail-img" alt="Homestay">
+
+        <div class="detail-content">
+            <div class="main-info">
+                <h2>Căn hộ toàn bộ do Chủ nhà làm chủ nhà</h2>
+                <p style="color:var(--text-muted); margin-bottom:2rem">
+                    <span th:text="${homestay.capacity}"></span> khách · 
+                    <span th:text="${homestay.bedCount}"></span> phòng ngủ · 
+                    <span th:text="${homestay.bathCount}"></span> phòng tắm
+                </p>
+
+                <hr style="border:0; border-top:1px solid var(--border); margin: 2rem 0;">
+
+                <h3>Mô tả chỗ ở</h3>
+                <p style="margin-top:1rem" th:text="${homestay.description}">Mô tả chi tiết...</p>
+
+                <hr style="border:0; border-top:1px solid var(--border); margin: 2rem 0;">
+
+                <h3>Tiện ích</h3>
+                <div class="amenities-list">
+                    <div th:each="amenity : ${homestay.amenities}" class="amenity-item">
+                        <i th:class="${amenity.icon} + ' fa-lg'"></i>
+                        <span th:text="${amenity.name}">Wifi</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="booking-widget">
+                <div style="margin-bottom:1rem">
+                    <span class="price"><span th:text="${#numbers.formatDecimal(homestay.pricePerNight, 0, 'COMMA', 0, 'POINT')}">1,500,000</span>₫</span> 
+                    <span style="color:var(--text-muted)">/ đêm</span>
+                </div>
+                
+                <!-- Error Message Display -->
+                <div th:if="${error}" style="background: #fff5f5; color: #c53030; padding: 10px; border-radius: 10px; margin-bottom: 15px; font-size: 0.9rem; font-weight: 600; border: 1px solid #feb2b2;">
+                    <i class="fa-solid fa-circle-exclamation"></i> [[${error}]]
+                </div>
+                
+                <form action="/booking/create" method="POST" style="display:flex; flex-direction:column; gap:10px;" onsubmit="return validateDates()">
+                    <input type="hidden" name="homestayId" th:value="${homestay.id}">
+                    <div style="display:flex; gap:10px">
+                        <div style="flex:1">
+                            <label style="font-size:0.8rem; font-weight:700">NHẬN PHÒNG</label>
+                            <input type="date" name="checkInDate" required style="width:100%; padding:10px; border:1px solid var(--border); border-radius:10px">
+                        </div>
+                        <div style="flex:1">
+                            <label style="font-size:0.8rem; font-weight:700">TRẢ PHÒNG</label>
+                            <input type="date" name="checkOutDate" required style="width:100%; padding:10px; border:1px solid var(--border); border-radius:10px">
+                        </div>
+                    </div>
+                    <div>
+                        <label style="font-size:0.8rem; font-weight:700">KHÁCH</label>
+                        <input type="number" name="guestCount" min="1" th:max="${homestay.capacity}" value="1" required style="width:100%; padding:10px; border:1px solid var(--border); border-radius:10px">
+                    </div>
+                    <div>
+                        <label style="font-size:0.8rem; font-weight:700">MÃ GIẢM GIÁ (Tuỳ chọn)</label>
+                        <div style="display:flex; gap:10px;">
+                            <input type="text" id="couponCodeInput" name="couponCode" placeholder="Nhập mã nếu có" style="flex:1; padding:10px; border:1px solid var(--border); border-radius:10px">
+                            <button type="button" onclick="validateCoupon()" style="padding:10px 15px; background:var(--primary); color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">Áp dụng</button>
+                        </div>
+                        <small id="couponMessage" style="display:block; margin-top:5px; font-weight:bold;"></small>
+                    </div>
+
+                    <button type="submit" class="btn-search" style="width:100%; margin-top:1rem; border-radius:10px; font-size:1.1rem; padding:12px;">Đặt phòng ngay</button>
+                </form>
+                
+                <p style="text-align:center; color:var(--text-muted); font-size:0.9rem; margin-top:1rem">Bạn vẫn chưa bị trừ tiền</p>
+                <hr style="border:0; border-top:1px solid var(--border); margin: 1.5rem 0;">
+                <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:1.2rem;">
+                    <span>Tổng tiền</span>
+                    <span id="displayTotalPrice" th:text="${#numbers.formatDecimal(homestay.pricePerNight, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var basePrice = /*[[${homestay.pricePerNight}]]*/ 0;
+        /*]]>*/
+
+        function updateTotalPriceDisplay(discountPercent = 0) {
+            var checkIn = document.querySelector('input[name="checkInDate"]').value;
+            var checkOut = document.querySelector('input[name="checkOutDate"]').value;
+            
+            var nights = 1;
+            if(checkIn && checkOut) {
+                var inDate = new Date(checkIn);
+                var outDate = new Date(checkOut);
+                var diffTime = Math.abs(outDate - inDate);
+                nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                if (nights === 0) nights = 1;
+            }
+
+            var total = basePrice * nights;
+            if(discountPercent > 0) {
+                total = total - (total * (discountPercent/100));
+            }
+            document.getElementById('displayTotalPrice').innerText = total.toLocaleString('vi-VN') + '₫';
+        }
+
+        document.querySelector('input[name="checkInDate"]').addEventListener('change', () => updateTotalPriceDisplay());
+        document.querySelector('input[name="checkOutDate"]').addEventListener('change', () => updateTotalPriceDisplay());
+
+        function validateCoupon() {
+            const code = document.getElementById('couponCodeInput').value;
+            if(!code) return;
+            
+            fetch('/api/coupons/validate?code=' + code)
+                .then(response => response.json())
+                .then(data => {
+                    if(data.error) {
+                        document.getElementById('couponMessage').style.color = "red";
+                        document.getElementById('couponMessage').innerText = data.error;
+                        updateTotalPriceDisplay(0);
+                    } else {
+                        document.getElementById('couponMessage').style.color = "green";
+                        document.getElementById('couponMessage').innerText = "Áp dụng thành công giảm " + data.discountPercent + "%!";
+                        updateTotalPriceDisplay(data.discountPercent);
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+        }
+
+        function validateDates() {
+            const checkIn = new Date(document.querySelector('input[name="checkInDate"]').value);
+            const checkOut = new Date(document.querySelector('input[name="checkOutDate"]').value);
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            if (checkIn < today) {
+                alert("Ngày nhận phòng không thể ở trong quá khứ.");
+                return false;
+            }
+            if (checkOut <= checkIn) {
+                alert("Ngày trả phòng phải sau ngày nhận phòng.");
+                return false;
+            }
+            return true;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Đặt phòng | Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .admin-layout { display: flex; min-height: 100vh; }
+        .sidebar { width: 250px; background: white; border-right: 1px solid var(--border); padding: 2rem 1rem; }
+        .sidebar-menu { list-style: none; margin-top: 2rem; }
+        .sidebar-menu li a { display: block; padding: 10px 15px; border-radius: 8px; margin-bottom: 5px; color: var(--text-main); font-weight: 500; }
+        .sidebar-menu li a:hover, .sidebar-menu li a.active { background: var(--bg-light); color: var(--primary); }
+        .sidebar-menu i { width: 25px; }
+        .main-content { flex: 1; padding: 2rem; background: var(--bg-light); }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-sm); }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background-color: #f8f9fa; font-weight: 600; }
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+        .status-pending { background-color: #fff3e0; color: #e65100; }
+        .status-paid { background-color: #e8f5e9; color: #2e7d32; }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <a href="/" class="nav-brand" style="font-size:1.2rem"><i class="fa-solid fa-house-chimney"></i> AdminPanel</a>
+            <ul class="sidebar-menu">
+                <li><a href="/admin/dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</a></li>
+                <li><a href="/admin/homestays"><i class="fa-solid fa-bed"></i> Quản lý phòng</a></li>
+                <li><a href="/admin/bookings" class="active"><i class="fa-solid fa-calendar-check"></i> Đặt phòng</a></li>
+                <li><a href="/admin/users"><i class="fa-solid fa-users"></i> Khách hàng</a></li>
+                <li><a href="/admin/coupons"><i class="fa-solid fa-ticket"></i> Mã giảm giá</a></li>
+                <li><a href="/admin/reports"><i class="fa-solid fa-chart-line"></i> Báo cáo</a></li>
+                <li><a href="/logout" style="color:var(--primary); margin-top:20px"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <h2 style="margin-bottom: 1.5rem;">Danh sách Đặt phòng</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Khách hàng</th>
+                        <th>Homestay</th>
+                        <th>Ngày</th>
+                        <th>Cọc/Phụ thu</th>
+                        <th>Tổng tiền</th>
+                        <th>Thanh toán</th>
+                        <th>Trạng thái</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="b : ${bookings}">
+                        <td th:text="${'#' + b.id}">1</td>
+                        <td th:text="${b.user.fullName}">Khách</td>
+                        <td th:text="${b.homestay.name}">Tên</td>
+                        <td style="font-size: 0.8rem;">
+                            <i class="fa-solid fa-arrow-right-to-bracket"></i> [[${b.checkInDate}]]<br/>
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i> [[${b.checkOutDate}]]
+                        </td>
+                        <td>
+                            <form th:action="@{'/admin/bookings/finance/' + ${b.id}}" method="post" style="font-size: 0.8rem;">
+                                Cọc: <input type="number" name="deposit" th:value="${b.depositAmount}" style="width:60px; padding:2px"><br/>
+                                Phụ: <input type="number" name="surcharge" th:value="${b.surchargeAmount}" style="width:60px; padding:2px">
+                                <button type="submit" style="background:none; border:none; color:blue; cursor:pointer"><i class="fa-solid fa-save"></i></button>
+                            </form>
+                        </td>
+                        <td th:text="${#numbers.formatDecimal(b.totalPrice, 0, 'COMMA', 0, 'POINT')}">Total</td>
+                        <td>
+                            <span th:class="'status-badge ' + (${b.paymentStatus == 'PAID'} ? 'status-paid' : 'status-pending')" th:text="${b.paymentStatus}">UNPAID</span>
+                        </td>
+                        <td>
+                            <form th:action="@{'/admin/bookings/status/' + ${b.id}}" method="post">
+                                <select name="status" onchange="this.form.submit()" style="padding: 2px; font-size: 0.8rem;">
+                                    <option value="PENDING" th:selected="${b.status == 'PENDING'}">Chờ duyệt</option>
+                                    <option value="APPROVED" th:selected="${b.status == 'APPROVED'}">Đã duyệt</option>
+                                    <option value="CHECKED_IN" th:selected="${b.status == 'CHECKED_IN'}">Đã Check-in</option>
+                                    <option value="CHECKED_OUT" th:selected="${b.status == 'CHECKED_OUT'}">Đã Check-out</option>
+                                    <option value="COMPLETED" th:selected="${b.status == 'COMPLETED'}">Hoàn thành</option>
+                                    <option value="CANCELED" th:selected="${b.status == 'CANCELED'}">Hủy bỏ</option>
+                                </select>
+                            </form>
+                        </td>
+                        <td>
+                             <a th:href="@{'/admin/bookings/delete/' + ${b.id}}" style="color: red;" onclick="return confirm('Xóa booking này?')"><i class="fa-solid fa-trash"></i></a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
+    </div>
+</body>
+</html>

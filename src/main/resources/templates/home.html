@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homestay Booking | Khám phá</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body id="top">
+
+    <nav class="navbar transparent">
+        <a href="/" class="nav-brand"><i class="fa-solid fa-house-chimney"></i> HomestayBooking</a>
+        <div class="nav-links">
+            <a href="/">Trang chủ</a>
+            <a href="/my-bookings">Chuyến đi</a>
+            
+            <span sec:authorize="isAnonymous()">
+                <a href="/login" class="btn-login"><i class="fa-regular fa-user"></i> Đăng nhập</a>
+            </span>
+            
+            <span sec:authorize="hasRole('ADMIN')">
+                <a href="/admin/dashboard" style="color: blue; font-weight: bold;"><i class="fa-solid fa-shield-halved"></i> Quản trị</a>
+            </span>
+
+            <span sec:authorize="isAuthenticated()">
+                <a href="/logout" class="btn-login" style="border-color: red; color: red;"><i class="fa-solid fa-right-from-bracket"></i> Thoát</a>
+            </span>
+        </div>
+    </nav>
+
+    <header class="hero-premium">
+        <div class="container hero-content">
+            <h1>Khám phá ngôi nhà <br> tiếp theo của bạn</h1>
+            <p>Tìm ưu đãi tốt nhất cho homestay và biệt thự nghỉ dưỡng</p>
+            
+            <div class="b-search-container" style="max-width: 1000px;">
+                <form action="/" method="GET" class="b-search-bar">
+                    <div class="b-search-item" style="flex: 1.5;">
+                        <i class="fa-solid fa-location-dot" style="color: var(--primary);"></i>
+                        <select class="b-search-select" name="city">
+                            <option value="">Bạn muốn đi đâu?</option>
+                            <option value="Đà Lạt">Đà Lạt</option>
+                            <option value="Vũng Tàu">Vũng Tàu</option>
+                            <option value="Sapa">Sapa</option>
+                            <option value="Hà Nội">Hà Nội</option>
+                            <option value="Phú Quốc">Phú Quốc</option>
+                        </select>
+                    </div>
+                    
+                    <div class="b-search-item">
+                        <i class="fa-regular fa-calendar-days"></i>
+                        <input type="date" class="b-search-input" name="checkIn" title="Ngày nhận phòng">
+                        <span style="color:#ccc">|</span>
+                        <input type="date" class="b-search-input" name="checkOut" title="Ngày trả phòng">
+                    </div>
+
+                    <div class="b-search-item">
+                        <i class="fa-regular fa-user"></i>
+                        <input type="number" name="guestCount" value="2" min="1" class="b-search-input" style="width: 50px;">
+                        <span style="font-weight: 600; color: #222; margin-left: 5px;">khách</span>
+                    </div>
+
+                    <button type="submit" class="b-btn-search">Tìm kiếm</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="margin-top: 4rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h2 style="font-size: 2rem; font-weight: 800;">Điểm đến phổ biến</h2>
+            <a href="#" style="color: var(--primary); font-weight: 600;">Xem tất cả <i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+        
+        <div class="grid">
+            <a th:each="hs : ${homestays}" th:href="@{/homestays/{id}(id=${hs.id})}" class="card">
+                <div class="card-img-wrapper">
+                    <img th:src="${hs.imageUrl}" class="card-img" alt="Homestay" loading="lazy">
+                    <div style="position: absolute; top: 12px; right: 12px; background: white; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; box-shadow: var(--shadow-sm); z-index: 10;">
+                        <i class="fa-solid fa-star" style="color: #ffb400;"></i> 4.8
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div class="card-title" th:text="${hs.name}">Tên Homestay</div>
+                        <div style="font-size: 0.9rem; font-weight: 600;"><i class="fa-solid fa-bolt" style="color: #FFB400;"></i></div>
+                    </div>
+                    <div class="card-subtitle"><i class="fa-solid fa-location-dot" style="font-size: 0.8rem;"></i> <span th:text="${hs.city}">Thành phố</span></div>
+                    <div class="price" style="margin-top: 8px;">
+                        <span th:text="${#numbers.formatDecimal(hs.pricePerNight, 0, 'COMMA', 0, 'POINT')}">1,000,000</span>₫ <span style="font-weight: 400; color: var(--text-muted); font-size: 0.9rem;">/ đêm</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <div th:if="${#lists.isEmpty(homestays)}" style="text-align: center; padding: 5rem 0;">
+            <i class="fa-solid fa-map-location-dot" style="font-size: 4rem; color: #eee; margin-bottom: 2rem; display: block;"></i>
+            <h3 style="font-size: 1.5rem; color: var(--text-muted);">Không tìm thấy chỗ nghỉ nào phù hợp.</h3>
+            <p style="margin-top: 1rem;">Thử thay đổi địa điểm hoặc ngày tháng để tìm thấy nhiều kết quả hơn.</p>
+            <a href="/" class="btn-login" style="margin-top: 2rem; display: inline-flex; background: var(--primary); color: white; border: none;">Xem tất cả homestay</a>
+        </div>
+
+        <div th:if="${totalPages > 1}" class="pagination">
+            <a th:href="@{/(page=${currentPage - 1}, city=${city})}" th:class="'page-link ' + ${currentPage == 0 ? 'disabled' : ''}">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+            
+            <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+               th:href="@{/(page=${i}, city=${city})}" 
+               th:class="'page-link ' + ${currentPage == i ? 'active' : ''}" 
+               th:text="${i + 1}">1</a>
+            
+            <a th:href="@{/(page=${currentPage + 1}, city=${city})}" th:class="'page-link ' + ${currentPage == totalPages - 1 ? 'disabled' : ''}">
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </div>
+
+        <section style="margin-top: 8rem; background: #f4f7f0; padding: 5rem; border-radius: var(--radius-lg); display: flex; align-items: center; gap: 4rem; border: 1px solid var(--border);">
+            <div style="flex: 1.2;">
+                <h2 style="font-family: 'Playfair Display', serif; font-size: 3rem; font-weight: 700; margin-bottom: 1.5rem; color: var(--primary);">Hơi thở đồng quê trong từng nhịp sống</h2>
+                <p style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 2.5rem; line-height: 1.8;">Rời xa khói bụi thành phố để trở về với thiên nhiên xanh mát, nơi những ngôi nhà gỗ ấm cúng đang chờ đón bạn.</p>
+                <a href="#top" class="btn-login" style="background: var(--primary); color: white; border: none; padding: 1.2rem 2.5rem; font-size: 1.1rem;">Bắt đầu hành trình</a>
+            </div>
+            <div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b" class="floating" style="width: 100%; height: 280px; object-fit: cover; border-radius: var(--radius-md); box-shadow: var(--shadow-lg);">
+                <img src="https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=800&q=80" class="floating" style="width: 100%; height: 280px; object-fit: cover; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); margin-top: 3rem; animation-delay: 1s;">
+            </div>
+        </section>
+    </main>
+
+    <footer style="background: #f7f7f7; padding: 5rem 0 3rem; margin-top: 6rem;">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; margin-bottom: 4rem;">
+                <div>
+                    <h4 style="margin-bottom: 1.5rem;">Hỗ trợ</h4>
+                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; color: var(--text-muted);">
+                        <li>Trung tâm trợ giúp</li>
+                        <li>Yêu cầu bồi thường</li>
+                        <li>Chính sách hủy</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="margin-bottom: 1.5rem;">Cộng đồng</h4>
+                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; color: var(--text-muted);">
+                        <li>Blog du lịch</li>
+                        <li>Diễn đàn</li>
+                        <li>Mời bạn bè</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="margin-bottom: 1.5rem;">Về chúng tôi</h4>
+                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; color: var(--text-muted);">
+                        <li>Cơ hội nghề nghiệp</li>
+                        <li>Tin tức</li>
+                        <li>Liên hệ</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="margin-bottom: 1.5rem;">Theo dõi chúng tôi</h4>
+                    <div style="display: flex; gap: 15px; font-size: 1.5rem; color: var(--text-main);">
+                        <i class="fa-brands fa-facebook"></i>
+                        <i class="fa-brands fa-instagram"></i>
+                        <i class="fa-brands fa-tiktok"></i>
+                    </div>
+                </div>
+            </div>
+            <div style="border-top: 1px solid var(--border); padding-top: 2rem; display: flex; justify-content: space-between; color: var(--text-muted); font-size: 0.9rem;">
+                <p>&copy; 2026 HomestayBooking Inc. · Quyền riêng tư · Điều khoản</p>
+                <div style="display: flex; gap: 20px; font-weight: 600;">
+                    <span>VNĐ</span>
+                    <span>Tiếng Việt</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

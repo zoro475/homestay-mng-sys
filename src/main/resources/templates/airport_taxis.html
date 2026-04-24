@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homestay Booking | Taxi Sân bay</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="nav-brand"><i class="fa-solid fa-house-chimney"></i> HomestayBooking</a>
+        <div class="nav-links">
+            <a href="/">Trang chủ</a>
+            <a href="/my-bookings">Chuyến đi</a>
+            
+            <span sec:authorize="isAnonymous()">
+                <a href="/login" class="btn-login"><i class="fa-regular fa-user"></i> Đăng nhập</a>
+            </span>
+            
+            <span sec:authorize="hasRole('ADMIN')">
+                <a href="/admin/dashboard" style="color: blue; font-weight: bold;"><i class="fa-solid fa-shield-halved"></i> Quản trị</a>
+            </span>
+
+            <span sec:authorize="isAuthenticated()">
+                <a href="/logout" class="btn-login" style="border-color: red; color: red;"><i class="fa-solid fa-right-from-bracket"></i> Thoát</a>
+            </span>
+        </div>
+    </nav>
+
+    <style>
+        .hero { background: #003b95 !important; color: white !important; padding: 4rem 10% !important; text-align: left; height: auto !important; }
+        .hero-tabs { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 3rem; padding-bottom: 10px; }
+        .hero-tab { padding: 10px 16px; border-radius: 20px; color: white; text-decoration: none; display: flex; align-items: center; gap: 8px; font-weight: 500; font-size: 0.95rem; white-space: nowrap; }
+        .hero-tab.active { background-color: rgba(255, 255, 255, 0.15); border: 1px solid white; }
+        .hero-tab:hover:not(.active) { background-color: rgba(255, 255, 255, 0.1); }
+        .hero h1 { font-size: 3rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .hero p { font-size: 1.5rem; color: white; margin-bottom: 3rem; font-weight: 400; }
+        
+        .b-search-container { position: relative; max-width: 1100px; }
+        .b-search-bar { display: flex; background: #ffb700; padding: 4px; border-radius: 8px; gap: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); align-items: stretch; }
+        .b-search-item { flex: 1; background: white; padding: 10px 15px; display: flex; align-items: center; gap: 10px; position: relative; }
+        .b-search-item.first { border-radius: 4px 0 0 4px; }
+        .b-search-item i { color: #555; font-size: 1.2rem; }
+        .b-search-select, .b-search-input { width: 100%; border: none; outline: none; font-size: 1rem; color: #333; background: transparent; cursor: pointer; }
+        .b-search-select { appearance: none; -webkit-appearance: none; font-weight: 500; }
+        
+        .b-btn-search { background: #0071c2; color: white; border: none; font-size: 1.25rem; font-weight: 600; padding: 0 30px; cursor: pointer; border-radius: 0 4px 4px 0; transition: background 0.2s; }
+        .b-btn-search:hover { background: #005999; }
+        
+        /* Coming soon box */
+        .coming-soon { text-align: center; padding: 5rem 2rem; background: white; border-radius: 12px; margin-top: 2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .coming-soon i { font-size: 4rem; color: #ffb700; margin-bottom: 1rem; }
+        .coming-soon h2 { color: #003b95; margin-bottom: 1rem; }
+        .coming-soon p { color: #666; font-size: 1.1rem; }
+    </style>
+
+    <header class="hero">
+        <div class="hero-tabs">
+            <a href="/" class="hero-tab"><i class="fa-solid fa-bed"></i> Lưu trú</a>
+            <a href="/flights" class="hero-tab"><i class="fa-solid fa-plane"></i> Chuyến bay</a>
+            <a href="/flights-hotels" class="hero-tab"><i class="fa-solid fa-earth-americas"></i> Chuyến bay + Khách sạn</a>
+            <a href="/car-rentals" class="hero-tab"><i class="fa-solid fa-car"></i> Thuê xe</a>
+            <a href="/activities" class="hero-tab"><i class="fa-solid fa-torii-gate"></i> Hoạt động</a>
+            <a href="/airport-taxis" class="hero-tab active"><i class="fa-solid fa-taxi"></i> Taxi sân bay</a>
+        </div>
+
+        <h1>Đặt taxi đón/tiễn sân bay</h1>
+        <p>Thoải mái di chuyển ngay từ lúc hạ cánh với tài xế chuyên nghiệp</p>
+        
+        <div class="b-search-container">
+            <form action="#" class="b-search-bar">
+                <div class="b-search-item first">
+                    <i class="fa-solid fa-plane-arrival"></i>
+                    <input type="text" class="b-search-input" placeholder="Nhập tên sân bay">
+                </div>
+                <div class="b-search-item">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <input type="text" class="b-search-input" placeholder="Điểm đến">
+                </div>
+                <div class="b-search-item">
+                    <i class="fa-regular fa-calendar"></i>
+                    <input type="date" class="b-search-input" title="Ngày đón">
+                </div>
+                <div class="b-search-item" style="max-width: 120px;">
+                    <i class="fa-regular fa-clock"></i>
+                    <input type="time" class="b-search-input" title="Giờ đón" value="12:00">
+                </div>
+
+                <button type="button" class="b-btn-search" onclick="alert('Dịch vụ Taxi hiện tại đang được kết nối với các đối tác vận tải.')">Tìm xe</button>
+            </form>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="coming-soon">
+            <i class="fa-solid fa-car-side"></i>
+            <h2>Di chuyển an toàn & Tiết kiệm</h2>
+            <p>Hệ thống đặt xe riêng đón/tiễn sân bay đang được tích hợp!</p>
+        </div>
+    </main>
+
+</body>
+</html>
